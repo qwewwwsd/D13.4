@@ -1,0 +1,22 @@
+{% extends "flatpages/default.html" %}
+
+{% load censor %}
+
+{% block header %}
+    {% if newss %}
+        <h1 style="text-align: center;">{{ newss.title|currency }}</h1>
+        <h4 style="text-align: center;">{{ newss.dateCreation|date:"d/m/Y" }}</span></h4>
+    {% else %}
+        <h1>Новостей нет!</h1>
+    {% endif %}
+{% endblock header %}
+
+{% block title %}
+Новость
+{% endblock title %}
+
+{% block content %}
+    {% if newss %}
+        <p>{{ newss.text|currency }}</p>
+   {% endif %}
+{% endblock content %}

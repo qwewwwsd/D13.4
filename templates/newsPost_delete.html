@@ -1,0 +1,24 @@
+{% extends "flatpages/default.html" %}
+
+{% block header %}
+
+<h1>Удаление новости</h1>
+
+{% endblock header %}
+
+{% block title %}
+Удаление новости
+{% endblock title %}
+
+{% block content %}
+    <h1 style="text-align: center">Удаление новости</h1>
+    <hr>
+    <form action="" method="post">
+        <div class="text-center">
+            {% csrf_token %}
+            <p>Вы точно хотите удалить "{{ object.title }}"?</p>
+            <input type="submit" class="btn btn-primary" value="Delete" />
+            <h4>&nbsp;</h4>
+        </div>
+    </form>
+{% endblock content %}

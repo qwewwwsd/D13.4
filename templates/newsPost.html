@@ -1,0 +1,66 @@
+{% extends "flatpages/default.html" %}
+
+{% block header %}
+
+<h1>Свежие новости</h1>
+<span class="subheading">Пролистайте вниз, для получения нужной вам информации!</span>
+
+{% endblock header %}
+
+{% load censor %}
+{% load custom_tags %}
+
+{% block title %}
+Новости
+{% endblock title %}
+
+{% block content %}
+  <h1 style="text-align: center;">Все новости</h1>
+  
+  {% if newss %}
+       <h3 style="text-align: center;">Количество новостей: {{newss|length}}</h3>
+       <h4>&nbsp;</h4>
+       <form action="/news/search">
+          <div style="text-align: center">
+            <input type="submit" class="btn btn-primary" value="Использовать фильтры">
+          </div>
+       </form>
+       {% for newsss in newss %}
+       <hr class="my-3" />
+       <table width="1000">
+           <tr>
+               <td><h2>{{ newsss.title|currency }}</h2></td>
+               <td><h4 style="text-align: right;"><span style="color: #999999;">{{ newsss.dateCreation|date:"d/m/Y" }}</span></h4></td>
+           </tr>
+           <tr>
+               <td><h3><span style="color: #3366ff;">{{ newsss.text|truncatechars:20|currency }}</span></h3></td> 
+               <td><h4 style="text-align: right;"><span style="color: #999999;">{{ newsss.category.name }}</span></h4></td>
+           </tr>
+       </table>
+       {% endfor %}
+  {% else %}
+      <h2>Новостей нет!</h2>
+  {% endif %}
+
+  <div class="text-center">
+  <h4>&nbsp;</h4>
+  {% if page_obj.has_previous %}
+      <a href="?{% url_replace page=1 %}">1</a>
+      {% if page_obj.previous_page_number != 1 %}
+        ...
+        <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+      {% endif %}
+  {% endif %}
+
+  {{ page_obj.number }}
+
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+      {% if paginator.num_pages != page_obj.next_page_number %}
+        ...
+        <a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+    {% endif %}
+  {% endif %}
+  <h4>&nbsp;</h4>
+  </div>
+{% endblock content %}
