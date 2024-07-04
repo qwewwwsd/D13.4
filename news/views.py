@@ -16,6 +16,10 @@ from .models import NewsPost, Category, Subscription
 from .filters import PostFilter
 from .forms import NewsPostForm, ArticlesForm
 
+from django.http import HttpResponse
+from django.views import View
+from .tasks import send_mail_new_post
+
 
 # Create your views here.
 class NewsPostList(ListView):
@@ -57,6 +61,12 @@ class NewsPostCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     model = NewsPost
     template_name = "newspost_edit.html"
     
+    def form_valid(self, form):
+        news = form.save(commit=False)
+        news.save()
+        send_mail_new_post.delay(news.id)
+        return super().form_valid(form)
+    
 
 class ArticleCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     permission_required = ('news.article_edit',)
@@ -64,6 +74,12 @@ class ArticleCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     form_class = ArticlesForm
     model = NewsPost
     template_name = "article_edit.html"
+    
+    def form_valid(self, form):
+        article = form.save(commit=False)
+        article.save()
+        send_mail_new_post.delay(article.id)
+        return super().form_valid(form)
     
 
 class NewsPostUpdate(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
