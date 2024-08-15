@@ -59,6 +59,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'django.middleware.cache.UpdateCacheMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
     
     'allauth.account.middleware.AccountMiddleware',
 ]
@@ -189,4 +193,115 @@ CACHES = {
         'LOCATION': os.path.join(BASE_DIR, 'cache_files'),
         'TIMEOUT': 5
     }
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'style' : '{',
+    'formatters': {
+        'for_DEBUG': {
+            'format': '%(asctime)s %(levelname)s %(message)s'
+        },
+        'for_WARNING' : {
+            'format': '%(asctime)s %(levelname)s %(message)s %(pathname)s'
+        },
+        'for_ERROR_and_CRITICAL': {
+          'format': '%(asctime)s %(levelname)s %(message)s %(pathname)s %(exc_info)s'
+        },
+        'for_general':{
+            'format': '%(asctime)s %(levelname)s %(module)s %(message)s'
+        },
+        'for_errors':{
+            'format': '%(asctime)s %(levelname)s %(message)s %(pathname)s %(exc_info)s'
+        },
+        'for_security':{
+            'format': '%(asctime)s %(levelname)s %(module)s %(message)s'
+        },
+        'mail':{
+            'format': '%(asctime)s %(levelname)s %(message)s %(pathname)s'
+        }
+    },
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+    },
+    'handlers': {
+        'console_DEBUG': {
+            'level': 'INFO',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'for_DEBUG'
+        },
+        'console_WARNING': {
+            'level': 'WARNING',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'for_WARNING'
+        },
+        'console_ERROR': {
+            'level': 'ERROR',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'for_ERROR_and_CRITICAL'
+        },
+        'general': {
+            'level': 'INFO',
+            'filters': ['require_debug_false'],
+            'class': 'logging.FileHandler',
+            'formatter': 'for_general',
+            'filename': 'logs/general.log'
+        },
+        'errors': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'logging.FileHandler',
+            'formatter': 'for_errors',
+            'filename': 'logs/errors.log'
+        },
+        'security':{
+            'level': 'DEBUG',
+            'filters': ['require_debug_false'],
+            'class': 'logging.FileHandler',
+            'formatter': 'for_security',
+            'filename': 'logs/security.log'
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler',
+            'formatter': 'mail'
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console_DEBUG', 'console_WARNING', 'console_ERROR', 'general'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['errors', 'mail_admins'],
+            'propagate': True,
+        },
+        'django.server': {
+            'handlers': ['errors', 'mail_admins'],
+            'propagate': True,
+        },
+        'django.template': {
+            'handlers': ['errors'],
+            'propagate': True,
+        },
+        'django.db.backends': {
+            'handlers': ['errors'],
+            'propagate': True,
+        },
+        'django.security': {
+            'handlers': ['security'],
+            'propagate': True,
+        }
+}
 }

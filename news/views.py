@@ -20,6 +20,12 @@ from django.http import HttpResponse
 from django.views import View
 from .tasks import send_mail_new_post
 
+from django.views.decorators.cache import cache_page
+from django.core.cache import cache
+
+@cache_page(60 * 15)
+def my_view(request):
+    ...
 
 # Create your views here.
 class NewsPostList(ListView):
@@ -52,6 +58,14 @@ class PostDetail(DetailView):
     model = NewsPost
     template_name = "newsPost_one.html"
     context_object_name = "newss"
+    
+    def get_object(self, *args, **kwargs):
+        obj = cache.get(f'newss-{self.kwargs["pk"]}', None)
+
+        if not obj:
+            obj = super().get_object(queryset=self.queryset)
+            cache.set(f'newss-{self.kwargs["pk"]}', obj)
+        return obj
 
 
 class NewsPostCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):

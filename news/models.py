@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
 
+from django.core.cache import cache
 
 class NewsPost(models.Model):
     title = models.CharField(
@@ -26,6 +27,10 @@ class NewsPost(models.Model):
     
     def get_absolute_url(self):
         return reverse("newspost_detail", args=[str(self.id)])
+    
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        cache.delete(f'news-{self.pk}')
 
 
 class Category(models.Model):
@@ -46,4 +51,11 @@ class Subscription(models.Model):
         to='Category',
         on_delete=models.CASCADE,
         related_name='subscriptions',
+    )
+
+class Author(models.Model):
+    name = models.CharField(
+        default='NoName',
+        max_length=64,
+        verbose_name='name of author'
     )
